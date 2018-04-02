@@ -58,7 +58,7 @@
 
 <script>
   import star from 'components/star/star';
-  import poptitle from 'components/popTitle/popTitle';
+  import poptitle from 'components/poptitle/poptitle';
 
     export default {
       name: "header",
