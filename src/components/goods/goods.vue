@@ -14,7 +14,7 @@
           <li v-for="item in goods" class="food-list fond-list-hook">
             <h1 class="title">{{item.name}}</h1>
             <ul>
-              <li v-for="food in item.foods" class="food-item border-1px">
+              <li @click="selectFood(food,$event)" v-for="food in item.foods" class="food-item border-1px">
                 <div class="icon" >
                   <img width="57" height="57" :src="food.icon">
                 </div>
@@ -36,14 +36,17 @@
           </li>
         </ul>
       </div>
-      <v-shopcart :select-foods="selectFoods" :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></v-shopcart>
+      <!--  v-ref:shopcart 父组件访问子组件的方法-->
+      <v-shopcart v-ref:shopcart :select-foods="selectFoods" :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></v-shopcart>
     </div>
+    <v-food :food="selectedFood" v-ref:food></v-food>
 </template>
 
 <script>
   import BScroll from 'better-scroll';
   import shopcart from 'components/shopcart/shopcart.vue';
   import cartcontrol from 'components/cartcontrol/cartcontrol.vue'
+  import food from 'components/food/food.vue'
     const ERR_NO = 0;
     export default {
       name: "goods",
@@ -56,7 +59,8 @@
         return{
           goods : [],
           foodListHeight : [],
-          scrollY : 0
+          scrollY : 0,
+          selectedFood:{ }    //点击单个的food，存储该food相关数据
         }
       },
       computed:{
@@ -129,16 +133,37 @@
           let aFoodList = this.$els.foodsWrap.getElementsByClassName('fond-list-hook');
           let ele = aFoodList[index];
           this.foodsScroll.scrollToElement(ele,100);
+        },
+        selectFood(food,$event){
+          if(!event._constructed){  //防止pc端的双次点击
+            return;
+          }
+          this.selectedFood = food;
+          this.$refs.food.show();
+        },
+        _drop(target){
+          //优化体验，异步执行下落动画
+          this.$nextTick(()=>{
+            //***父组件访问子组件的方法
+            this.$refs.shopcart.drop(target);
+          })
         }
       },
       components:{
         "v-shopcart":shopcart,
-        "v-cartcontrol": cartcontrol
+        "v-cartcontrol": cartcontrol,
+        "v-food": food
+      },
+      events:{
+        //接收子组件的事件,target就是dom对象
+        'cart.add'(target) {
+          this._drop(target);
+        }
       }
     }
 </script>
 
-<style  lang="stylus" rel="stylesheet/stylus">
+<style lang="stylus" rel="stylesheet/stylus">
   @import "../../common/stylus/mixin.styl"
   @import "../../common/stylus/base.styl"
 .goods

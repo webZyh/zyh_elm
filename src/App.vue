@@ -18,28 +18,36 @@
     </div>
     <!-- 路由出口 -->
     <!-- 路由匹配到的组件将渲染在这里 -->
-    <router-view :seller="seller"></router-view>
+    <router-view :seller="seller" keep-alive></router-view>
   </div>
 </template>
 
 <script>
 //引用组件
   import header from 'components/header/header';
+
+  import { urlParse } from './common/js/util';
   //状态码为0是成功
   const ERR_OK = 0;
 
   export default {
     data() {
       return {
-        seller: {}
+        seller: {
+          id:(()=>{
+            let queryParam = urlParse();
+            return queryParam.id;
+          })()
+        }
       };
     },
     created(){
-      this.$http.get('/api/seller').then((res) => {
+      this.$http.get('/api/seller?id='+this.seller.id).then((res) => {
         res = res.body;
         //console.log(res);
         if(res.errno === ERR_OK){
-          this.seller = res.data;
+          //this.seller = res.data;
+          this.seller = Object.assign({},this.seller, res.data);
         }
       });
     },

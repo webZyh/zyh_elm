@@ -1,10 +1,10 @@
 <template>
   <div class="cart-control">
-    <div class="decrease" v-show="food.count>0" @click="reduceCount($event)" transition="move">
+    <div class="decrease" v-show="food.count>0" @click.stop.prevent="reduceCount($event)" transition="move">
       <span class="inner icon-remove_circle_outline"></span>
     </div>
     <div class="count" v-show="food.count>0">{{food.count}}</div>
-    <div class="increase icon-add_circle" @click="addCount($event)"></div>
+    <div class="increase icon-add_circle" @click.stop.prevent="addCount($event)"></div>
   </div>
 </template>
 
@@ -30,6 +30,8 @@
           }else{
             this.food.count++;
           }
+          /*派发一个事件，将DOM对象event.target作为这个事件的参数*/
+          this.$dispatch('cart.add', event.target);
         },
         reduceCount(event){
           if(!event._constructed){  //防止pc端的双次点击
@@ -52,7 +54,7 @@
     transition all 0.4s linear
     &.move-transition
       opacity 1
-      transform translate3D(0,0,0)
+      transform translate3d(0,0,0)
       .inner
         display inline-block
         line-height 24px
@@ -62,7 +64,7 @@
         transform rotate(0)
     &.move-enter, &.move-leave
       opacity 0
-      transform: translate3D(24px,0,0)
+      transform: translate3d(24px,0,0)
       .inner
         transform rotate( 180deg )
   .increase

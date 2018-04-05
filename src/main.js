@@ -52,4 +52,4 @@ router.map({
 });
 //挂载
 router.start(app,'#app');
-router.go('/goods');
+//router.go('/goods');
